@@ -1,0 +1,17 @@
+{
+  "common": {
+    "title": "Ser Aymeric",
+    "en": "English",
+    "fr": "French",
+    "de": "German",
+    "jp": "Japanese"
+  },
+  "navigation": {
+    "home": "Home",
+    "install": "Install",
+    "commands": "Commands",
+    "features": "Features",
+    "login": "Log In",
+    "logout": "Log Out"
+  }
+}

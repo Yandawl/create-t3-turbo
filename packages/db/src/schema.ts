@@ -1,92 +1,120 @@
-import { relations, sql } from "drizzle-orm";
-import {
-  integer,
-  pgTable,
-  primaryKey,
-  text,
-  timestamp,
-  uuid,
-  varchar,
-} from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
+import mongoose, { Model, Schema } from "mongoose";
 
-export const Post = pgTable("post", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
-  title: varchar("name", { length: 256 }).notNull(),
-  content: text("content").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt", {
-    mode: "date",
-    withTimezone: true,
-  }).$onUpdateFn(() => sql`now()`),
+interface IGuild {
+  SERVER_ID: string;
+  OWNER_ID: string;
+  DISABLED: boolean;
+  CREATED_ON: string;
+  MEMBERS: number;
+  BOTADMINISTRATORS: string[];
+  MUSIC: {
+    ENABLED: boolean;
+    VOTE_ENABLED: boolean;
+    VOLUME: number;
+  };
+  ANALYTICS: {
+    ENABLED: boolean;
+  };
+  ROLES: {
+    ENABLED: boolean;
+    REMOVE_REACTION: boolean;
+    GROUPS: string[];
+  };
+  EVENTS: {
+    MANAGERS: string[];
+  };
+  PROFILES: {
+    ENABLED: boolean;
+    SPEED: number;
+    NOEXPROLES: string[];
+    NOEXPCHANNELS: string[];
+    LEVEL_REWARDS_ENABLED: boolean;
+    REP_REWARDS_ENABLED: boolean;
+    ANNOUNCE_LEVEL_UP_CHANNEL: boolean;
+    DELETE_LEVEL_NOTIFICATIONS: boolean;
+    DELETE_LEVEL_NOTIFICATIONS_AFTER: number;
+    MESSAGE: string;
+    REMOVE_PREVIOUS: boolean;
+    LEVEL_5_ROLE: string;
+    LEVEL_10_ROLE: string;
+    LEVEL_20_ROLE: string;
+    LEVEL_30_ROLE: string;
+    LEVEL_40_ROLE: string;
+    LEVEL_50_ROLE: string;
+    LEVEL_60_ROLE: string;
+    LEVEL_70_ROLE: string;
+    LEVEL_80_ROLE: string;
+    LEVEL_90_ROLE: string;
+    LEVEL_100_ROLE: string;
+    REP_5_ROLE: string;
+    REP_10_ROLE: string;
+    REP_20_ROLE: string;
+    REP_30_ROLE: string;
+    REP_40_ROLE: string;
+    REP_50_ROLE: string;
+    REP_60_ROLE: string;
+    REP_70_ROLE: string;
+    REP_80_ROLE: string;
+    REP_90_ROLE: string;
+    REP_100_ROLE: string;
+  };
+  MODERATION: {
+    ENABLED: boolean;
+    RAIDMODE: boolean;
+    RAID_MESSAGE: string;
+    ACCOUNT_AGE_REMOVE_ENABLED: boolean;
+    ACCOUNT_AGE_REMOVE_DAYS: number;
+    LOGJOINERS: boolean;
+    LOGLEAVERS: boolean;
+    LOGBANS: boolean;
+    LOGUNBANS: boolean;
+    LOGJOINVC: boolean;
+    LOGLEAVEVC: boolean;
+    LOGJOINERSCHANNEL: string;
+    LOGLEAVERSCHANNEL: string;
+    LOGBANSCHANNEL: string;
+    LOGUNBANSCHANNEL: string;
+    LOGJOINVCCHANNEL: string;
+    LOGLEAVEVCCHANNEL: string;
+    AUTOPURGEENABLED: boolean;
+    AUTOPURGE: string[];
+    AUTOPURGEAFTER: number;
+  };
+  STREAMERS: {
+    STREAMERS: string[];
+  };
+  FEEDS: {};
+  CUSTOMCOMMANDS: {
+    COMMANDS: string[];
+  };
+  WELCOME: {
+    ENABLED: boolean;
+    MENTION_USER: boolean;
+    MENTION_ROLE: boolean;
+    MENTION_ROLE_ID: string;
+    MESSAGE: string;
+    IMAGE_URL: string;
+    FIELDS: string[];
+    SEND_CHANNEL: boolean;
+    CHANNEL_ID: string;
+    SEND_DM: boolean;
+    JOIN_ROLE_ENABLED: boolean;
+    JOIN_ROLE: string;
+  };
+  ANNOUNCEMENTS: {};
+}
+
+const GuildSchema = new Schema<IGuild>({
+  SERVER_ID: { type: String, required: true },
+  OWNER_ID: { type: String, required: true },
+  DISABLED: { type: Boolean, required: true },
+  CREATED_ON: { type: String, required: true },
+  MEMBERS: { type: Number, required: true },
 });
 
-export const CreatePostSchema = createInsertSchema(Post, {
-  title: z.string().max(256),
-  content: z.string().max(256),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+console.log("GuildSchema", mongoose.models.Guild);
 
-export const User = pgTable("user", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
-  name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 255 }).notNull(),
-  emailVerified: timestamp("emailVerified", {
-    mode: "date",
-    withTimezone: true,
-  }),
-  image: varchar("image", { length: 255 }),
-});
+const Guild: Model<IGuild> =
+  mongoose.models.Guild || mongoose.model<IGuild>("Guild", GuildSchema);
 
-export const UserRelations = relations(User, ({ many }) => ({
-  accounts: many(Account),
-}));
-
-export const Account = pgTable(
-  "account",
-  {
-    userId: uuid("userId")
-      .notNull()
-      .references(() => User.id, { onDelete: "cascade" }),
-    type: varchar("type", { length: 255 })
-      .$type<"email" | "oauth" | "oidc" | "webauthn">()
-      .notNull(),
-    provider: varchar("provider", { length: 255 }).notNull(),
-    providerAccountId: varchar("providerAccountId", { length: 255 }).notNull(),
-    refresh_token: varchar("refresh_token", { length: 255 }),
-    access_token: text("access_token"),
-    expires_at: integer("expires_at"),
-    token_type: varchar("token_type", { length: 255 }),
-    scope: varchar("scope", { length: 255 }),
-    id_token: text("id_token"),
-    session_state: varchar("session_state", { length: 255 }),
-  },
-  (account) => ({
-    compoundKey: primaryKey({
-      columns: [account.provider, account.providerAccountId],
-    }),
-  }),
-);
-
-export const AccountRelations = relations(Account, ({ one }) => ({
-  user: one(User, { fields: [Account.userId], references: [User.id] }),
-}));
-
-export const Session = pgTable("session", {
-  sessionToken: varchar("sessionToken", { length: 255 }).notNull().primaryKey(),
-  userId: uuid("userId")
-    .notNull()
-    .references(() => User.id, { onDelete: "cascade" }),
-  expires: timestamp("expires", {
-    mode: "date",
-    withTimezone: true,
-  }).notNull(),
-});
-
-export const SessionRelations = relations(Session, ({ one }) => ({
-  user: one(User, { fields: [Session.userId], references: [User.id] }),
-}));
+export { type IGuild, Guild };

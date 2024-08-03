@@ -1,0 +1,17 @@
+{
+  "common": {
+    "title": "サー・アイメリック",
+    "en": "英語",
+    "fr": "フランス語",
+    "de": "ドイツ語",
+    "jp": "日本語"
+  },
+  "navigation": {
+    "home": "ホーム",
+    "install": "インストール",
+    "commands": "コマンド",
+    "features": "機能",
+    "login": "ログイン",
+    "logout": "ログアウト"
+  }
+}

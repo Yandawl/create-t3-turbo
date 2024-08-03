@@ -44,12 +44,10 @@ apps
   |   ├─ Expo SDK 51
   |   ├─ React Native using React 18
   |   ├─ Navigation using Expo Router
-  |   ├─ Tailwind using NativeWind
   |   └─ Typesafe API calls using tRPC
   └─ next.js
       ├─ Next.js 14
       ├─ React 18
-      ├─ Tailwind CSS
       └─ E2E Typesafe API Server & Client
 packages
   ├─ api
@@ -65,13 +63,11 @@ tooling
   |   └─ shared, fine-grained, eslint presets
   ├─ prettier
   |   └─ shared prettier configuration
-  ├─ tailwind
-  |   └─ shared tailwind configuration
   └─ typescript
       └─ shared tsconfig you can extend from
 ```
 
-> In this template, we use `@acme` as a placeholder for package names. As a user, you might want to replace it with your own organization or project name. You can use find-and-replace to change all the instances of `@acme` to something like `@my-company` or `@project-name`.
+> In this template, we use `@webmeric` as a placeholder for package names. As a user, you might want to replace it with your own organization or project name. You can use find-and-replace to change all the instances of `@webmeric` to something like `@my-company` or `@project-name`.
 
 ## Quick Start
 
